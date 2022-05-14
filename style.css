@@ -1,0 +1,49 @@
+*{
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+html, body {
+	display: block;
+}
+
+@media (prefers-color-scheme:dark){
+	*{
+		--color:#fff;
+		background-color: #222;
+	}
+}
+@media (prefers-color-scheme:light){
+	*{
+		--color:#000;
+		background-color: #fff;
+	}
+}
+
+terminal{
+	background-color: #000;
+	color: var(--color);
+	font-family: monospace;
+	font-size: 12px;
+	padding: 0px;
+	margin: 0px;
+}
+
+terminal tr {
+	display: block;
+}
+
+terminal td {
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+	width: 10px;
+	height: 14px;
+}
+
+terminal span {
+	background-color: var(--color);
+	margin-top: 12px;
+	height: 2px;
+	width: 10px;
+}
