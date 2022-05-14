@@ -2,8 +2,7 @@ import { terminal , input } from './terminal.js';
 
 // example of simple shell
 let lines = 0
-let ele = document.querySelector('terminal')
-const term = new terminal(ele, window.innerHeight/15 - 1, window.innerWidth/10 - 3);
+const term = new terminal(document.querySelector('terminal'), window.innerHeight/15 - 1, window.innerWidth/10 - 3);
 
 const inp = new input(term);
 inp.onkey = function (e){}
