@@ -11,12 +11,8 @@ var terminal = function (terminalel, row = 10, column = 10) {
 	this.backgroundColor = "#222";
 	this.color = "#fff";
 	this.beeeeeper = document.createElement('audio');
-	this.init();
 	this.oncursormove = function (){}
-}
 
-
-terminal.prototype.init = function () {
 	this.terminalel.innerHTML = "";
 	let tb = document.createElement('table');
 	this.terminalel.appendChild(tb);
@@ -77,7 +73,7 @@ terminal.prototype.setcolorbg = function (color = "#222") {
 	this.backgroundColor = color;
 }
 
-terminal.prototype.setcolor = function (color = "#fff") {
+terminal.prototype.setcolorfg = function (color = "#fff") {
 	// if the color is a array, then set the color of the cursor
 	if (Array.isArray(color)) color = 'rgb('+color[0]+','+color[1]+','+color[2]+')';
 	this.color = color;
@@ -170,56 +166,56 @@ terminal.prototype.putchar = function (char) {
 						switch (colors[i]) {
 							case '0':
 								this.setcolorbg();
-								this.setcolor();
+								this.setcolorfg();
 								break;
 							case '30':
-								this.setcolor("#222");
+								this.setcolorfg("#222");
 								break;
 							case '31':
-								this.setcolor([255,0,0]);
+								this.setcolorfg([255,0,0]);
 								break;
 							case '32':
-								this.setcolor([0,255,0]);
+								this.setcolorfg([0,255,0]);
 								break;
 							case '33':
-								this.setcolor([255,255,0]);
+								this.setcolorfg([255,255,0]);
 								break;
 							case '34':
-								this.setcolor([0,0,255]);
+								this.setcolorfg([0,0,255]);
 								break;
 							case '35':
-								this.setcolor([255,0,255]);
+								this.setcolorfg([255,0,255]);
 								break;
 							case '36':
-								this.setcolor([0,255,255]);
+								this.setcolorfg([0,255,255]);
 								break;
 							case '37':
-								this.setcolor([255,255,255]);
+								this.setcolorfg([255,255,255]);
 								break;
 							// Bright color
 							case '90':
-								this.setcolor([118,118,118]);
+								this.setcolorfg([118,118,118]);
 								break;
 							case '91':
-								this.setcolor([231,72,86]);
+								this.setcolorfg([231,72,86]);
 								break;
 							case '92':
-								this.setcolor([22,198,12]);
+								this.setcolorfg([22,198,12]);
 								break;
 							case '93':
-								this.setcolor([249,241,165]);
+								this.setcolorfg([249,241,165]);
 								break;
 							case '94':
-								this.setcolor([59,120,255]);
+								this.setcolorfg([59,120,255]);
 								break;
 							case '95':
-								this.setcolor([180,0,158]);
+								this.setcolorfg([180,0,158]);
 								break;
 							case '96':
-								this.setcolor([97,214,214]);
+								this.setcolorfg([97,214,214]);
 								break;
 							case '97':
-								this.setcolor([242,242,242]);
+								this.setcolorfg([242,242,242]);
 								break;
 							// background color
 							case '40':
@@ -283,12 +279,12 @@ terminal.prototype.putchar = function (char) {
 				} else if (colors.length == 5) {
 					// 24-bit refference: https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
 					if (colors[0] == "38") {
-						this.setcolor([colors[2],colors[3],colors[4]]);
+						this.setcolorfg([colors[2],colors[3],colors[4]]);
 					} else if (colors[0] == "48") {
 						this.setcolorbg([colors[2],colors[3],colors[4]]);
 					}
 				} else {
-					this.setcolor(0);
+					this.setcolorfg(0);
 				}
 				this.escape = false;
 				this.escapestring = "";
@@ -409,34 +405,34 @@ terminal.prototype.puts = function (text) {
 	return text.length;
 }
 
-terminal.prototype.printf = function (format, ...args) {
+terminal.prototype.printf = function (text, ...args) {
 	let on = false;
 	let result = '';
-	for (let i = 0; i < format.length; i++) {
-		if (format[i] == "%") {
+	for (let i = 0; i < text.length; i++) {
+		if (text[i] == "%") {
 			on = true;
 		} else if (on) {
 			on = false;
-			if (format[i] == "d" || format[i] == "i" || format[i] == "ld" || format[i] == "li" || format[i] == "hd" || format[i] == "hi" || format[i] == "f" || format[i] == "s") {
+			if (text[i] == "d" || text[i] == "i" || text[i] == "ld" || text[i] == "li" || text[i] == "hd" || text[i] == "hi" || text[i] == "f" || text[i] == "s") {
 				result += args[0]
 				args.shift();
-			} else if (format[i] == "c") {
+			} else if (text[i] == "c") {
 				result += String.fromCharCode(args[0]);
 				args.shift();
-			} else if (format[i] == "p") {
+			} else if (text[i] == "p") {
 				console.log("are you stupid? I don't know how to print a pointer in javascript");
 				args.shift();
-			} else if (format[i] == "x" || format[i] == "X") {
+			} else if (text[i] == "x" || text[i] == "X") {
 				result += args[0].toString(16);
-			} else if (format[i] == "o") {
+			} else if (text[i] == "o") {
 				result += args[0].toString(8);
-			} else if (format[i] == "u") {
+			} else if (text[i] == "u") {
 				result += args[0].toString(10);
 			} else {
-				result += format[i];
+				result += text[i];
 			}
 		} else {
-			result += format[i];
+			result += text[i];
 		}
 	}
 	return this.puts(result);
