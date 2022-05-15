@@ -1,5 +1,5 @@
 # terminal
-terminal recreate a functional terminal who can read escape sequences
+terminal creates a functional terminal which can read escape sequences
 some C functions like printf() and putchar()
 
 read the documentation https://github.com/flamebousteur/terminal/wiki/doc
@@ -21,7 +21,9 @@ for (let i = 0; i < 11; i++) {
 term.puts("\x1b[1;31mHello\x1b[m \x1b[1;32mWorld\x1b[m \x1b[1;33m!\x1b[0m\n");
 term.printf("%s %s %s\n", "Hello", "World", "!");
 ```
+
 ![](./capture1.png)
+
 
 input example:
 ```js
