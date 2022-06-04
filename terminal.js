@@ -420,7 +420,7 @@ terminal.prototype.printf = function (text, ...args) {
 				result += String.fromCharCode(args[0]);
 				args.shift();
 			} else if (text[i] == "p") {
-				console.log("are you stupid? I don't know how to print a pointer in javascript");
+				console.log("I don't know how to print a pointer in javascript");
 				args.shift();
 			} else if (text[i] == "x" || text[i] == "X") {
 				result += args[0].toString(16);
