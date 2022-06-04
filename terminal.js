@@ -584,4 +584,37 @@ input.prototype.key = function (e) {
 	}
 }
 
+// webassembly module for terminal ============================================================
+// not ready
+var wasm = function (url, term) {
+	this.term = term;
+	this.init(url);
+}
+
+wasm.prototype.init = function (url) {
+	this.exports;
+		var memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
+	var importObject = {
+		env: {
+			__memory_base: 1024,
+			__table_base: 0,
+			memory: memory,
+			table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
+			puts: function(ptr) {
+				console.log(getStringFromWasm(ptr));
+			},
+		}
+	}
+	WebAssembly.instantiateStreaming(
+		fetch(url),importObject
+	).then(result => {
+		exports = result.instance.exports;
+		onready(exports);
+	}).catch(console.error);
+}
+
+wasm.prototype.onready = function(exports) {
+	console.log(exports.main());
+}
+
 export { terminal , input };
