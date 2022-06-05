@@ -80,7 +80,7 @@ terminal.prototype.setcolorfg = function (color = "#fff") {
 }
 
 terminal.prototype.putchar = function (char) {
-	if (typeof char === Number) char = String.fromCharCode(char);
+	if (typeof char == "number") char = String.fromCharCode(char);
 	if (char.length > 1) throw new Error("putchar: char must be a single character or a number");
 	if (this.escape){
 		// the escape sequence
@@ -398,7 +398,7 @@ terminal.prototype.putchar = function (char) {
 }
 
 terminal.prototype.puts = function (text) {
-	if (typeof text === Number) return this.putchar(text);
+	if (typeof text == "number") return this.putchar(text);
 	for (let i = 0; i < text.length; i++) {
 		this.putchar(text[i]);
 	}
@@ -586,35 +586,38 @@ input.prototype.key = function (e) {
 
 // webassembly module for terminal ============================================================
 // not ready
+
 var wasm = function (url, term) {
 	this.term = term;
-	this.init(url);
-}
-
-wasm.prototype.init = function (url) {
 	this.exports;
-		var memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
+
+	var memory;
 	var importObject = {
 		env: {
-			__memory_base: 1024,
-			__table_base: 0,
-			memory: memory,
-			table: new WebAssembly.Table({ initial: 0, maximum: 0, element: 'anyfunc' }),
-			puts: function(ptr) {
-				console.log(getStringFromWasm(ptr));
+			puts: function (offset, length) {
+				console.log(offset)
+				if (length) {
+					let buffer = new Uint8Array(memory.buffer);
+					let r = ""
+					for (let i = offset; buffer[i] ; i++) {
+						r += String.fromCharCode(buffer[i])
+					}
+					term.puts(r);
+				} else {
+					term.puts(offset);
+				}
 			},
-		}
+			putchar: function (c) {
+				term.putchar(c)
+			}
+		},
 	}
-	WebAssembly.instantiateStreaming(
-		fetch(url),importObject
-	).then(result => {
-		exports = result.instance.exports;
-		onready(exports);
+	WebAssembly.instantiateStreaming(fetch(url),importObject)
+	.then(result => {
+		this.exports = result.instance.exports;
+		memory = result.instance.exports.memory;
+		console.log("result: "+this.exports.main());
 	}).catch(console.error);
-}
-
-wasm.prototype.onready = function(exports) {
-	console.log(exports.main());
 }
 
 export { terminal , input };

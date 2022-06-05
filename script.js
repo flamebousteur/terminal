@@ -2,9 +2,7 @@ import { terminal, wasm } from './terminal.js';
 
 // example of simple shell
 const term = new terminal(document.querySelector('terminal'), window.innerHeight/15 - 1, window.innerWidth/10 - 3);
-const twasm = new wasm("./main.wasm");
 
-/*
 // demo
 for (let i = 0; i < 11; i++) {
 	for (let j = 0; j < 10; j++) {
@@ -17,4 +15,3 @@ for (let i = 0; i < 11; i++) {
 
 term.puts("\x1b[1;31mHello\x1b[m \x1b[1;32mWorld\x1b[m \x1b[1;33m!\x1b[0m\n");
 term.printf("%s %s %c\n", "Hello", "World", 33);
-*/
