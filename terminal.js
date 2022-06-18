@@ -587,37 +587,55 @@ input.prototype.key = function (e) {
 // webassembly module for terminal ============================================================
 // not ready
 
-var wasm = function (url, term) {
-	this.term = term;
-	this.exports;
-
+var wasm = function (url, term, importObject = null) {
 	var memory;
-	var importObject = {
-		env: {
-			puts: function (offset, length) {
-				console.log(offset)
-				if (length) {
-					let buffer = new Uint8Array(memory.buffer);
-					let r = ""
-					for (let i = offset; buffer[i] ; i++) {
-						r += String.fromCharCode(buffer[i])
+	if (importObject === null) {
+		var importObject = {
+			env: {
+				__stack_pointer: 0,
+				__memory_base: 0,
+				__table_base: 0,
+				memory: function (initial) {
+					memory = new WebAssembly.Memory({initial: initial});
+					return memory;
+				},
+				__indirect_function_table: function (initial) {
+					return new WebAssembly.Table({initial: initial, element: "anyfunc"});
+				},
+				puts: function (offset, length) {
+					console.log(offset)
+					if (length) {
+						let buffer = new Uint8Array(memory.buffer);
+						let r = ""
+						for (let i = offset; buffer[i] ; i++) {
+							r += String.fromCharCode(buffer[i])
+						}
+						term.puts(r);
+					} else {
+						term.puts(offset);
 					}
-					term.puts(r);
-				} else {
-					term.puts(offset);
-				}
+				},
+				putchar: function (c) {
+					term.putchar(c)
+				},
+				getColumns: () => {
+					return term.column;
+				},
+				getRows: () => {
+					return term.lines;
+				},
 			},
-			putchar: function (c) {
-				term.putchar(c)
-			}
-		},
+		}
 	}
-	WebAssembly.instantiateStreaming(fetch(url),importObject)
-	.then(result => {
-		this.exports = result.instance.exports;
-		memory = result.instance.exports.memory;
-		console.log("result: "+this.exports.main());
-	}).catch(console.error);
+	var r;
+	return new Promise(function(resolve, reject) {
+		WebAssembly.instantiateStreaming(fetch(url),importObject)
+		.then(result => {
+			r = result.instance.exports;
+			memory = r.memory;
+			resolve(r);
+		}).catch(e => reject(e));
+	})
 }
 
-export { terminal , input };
+export { terminal, input, wasm };
