@@ -1,2 +1,5 @@
 doc.md
 *.bat
+
+# delete all the out of emcc
+*.out.*

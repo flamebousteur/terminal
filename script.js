@@ -20,5 +20,6 @@ term.printf("%s %s %c\n", "Hello", "World", 33);
 
 (async function() {
 	const wsm = await wasm("./wasm/hello world.wasm", true, term);
-	console.log(wsm._start());
+
+	console.log("_start", wsm._start());
 })();

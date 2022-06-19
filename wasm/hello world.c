@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main() {
-	putchar('H');
+	puts("test");
 	return 1;
 }
