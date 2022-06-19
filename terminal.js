@@ -268,7 +268,9 @@ terminal.prototype.putchar = function (char) {
 								this.setcolorbg([242,242,242]);
 								break;
 							default:
-//								throw new Error("Unknown SGR color: " + colors[i]);
+								this.setcolorbg();
+								this.setcolorfg();
+								break;
 						}
 					}
 				} else if (colors.length == 3) {
@@ -585,7 +587,8 @@ input.prototype.key = function (e) {
 }
 
 // webassembly module for terminal ============================================================
-// not ready
+// not finished but working
+
 var wams_func = function(term = null) {
 	if (term != null) {
 		this.term = term;
@@ -593,13 +596,13 @@ var wams_func = function(term = null) {
 	this.stream = {
 		stdout: function (char){
 			if (term) term.putchar(char);
+			else console.log(char);
 		}
 	}
 }
 
 wams_func.prototype.fd_write = function(fd, char) {
 	if (fd == 1) {
-		console.log(1, String.fromCharCode(char), char);
 		this.stream.stdout(char);
 	}
 }
@@ -613,6 +616,16 @@ var wasm = function (url, importObject = true, term = null) {
 	else wmsf = new wams_func();
 	if (importObject === true) {
 		var importObject = {
+			env: {
+				getColumns: function () {
+					if (term) return term.column;
+					else return 0;
+				},
+				getRows: function () {
+					if (term) return term.row;
+					else return 0;
+				}
+			},
 			wasi_snapshot_preview1:{
 				proc_exit: function(code) {
 					console.log("exit code: ", code);

@@ -1,11 +1,15 @@
-#define TRUE (1)
-#define true (1)
+#ifndef TERMINAL_JS
+#define TERMINAL_JS
 
-#define FALSE (0)
-#define false (0)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define NULL (0)
-#define null (0)
+extern int getColumns();
+extern int getRows();
 
-int getColumns();
-int getRows();
+#ifdef __cplusplus
+}
+#endif
+
+#endif
