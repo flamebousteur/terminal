@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include "./terminalJS.h"
 
-int main() {
-	printf("%d : %d", getColumns(), getRows());
+int main(int argc, char *argv[]) {
+	// use the terminalJS.h functions to get the terminal size
+	printf("%d : %d\n", getColumns(), getRows());
+
+	// print all the arguments
+	for (int i = 0; i < argc; i++) {
+		printf("%d : %s\n", i, argv[i]);
+	}
 	return 0;
 }
 

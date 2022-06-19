@@ -18,7 +18,9 @@ term.puts("\x1b[1;31mHello\x1b[m \x1b[1;32mWorld\x1b[m \x1b[1;33m!\x1b[0m\n");
 term.printf("%s %s %c\n", "Hello", "World", 33);
 */
 
+var args = ["hello", "world"];
+
 (async function() {
-	const wsm = await wasm("./wasm/main.wasm", true, term);
+	const wsm = await wasm("./wasm/main.wasm", true, args, term);
 	console.log("_start", wsm._start());
 })();

@@ -607,7 +607,7 @@ wams_func.prototype.fd_write = function(fd, char) {
 	}
 }
 
-var wasm = function (url, importObject = true, term = null) {
+var wasm = function (url, importObject = true, args = [], term = null) {
 	var memory;
 	var memory8;
 	var memory32;
@@ -655,7 +655,29 @@ var wasm = function (url, importObject = true, term = null) {
 				fd_seek: function(fd, offset, whence) {
 					console.log(fd, offset, whence)
 					return 1;
-				}
+				},
+				args_sizes_get: function(pnum) {
+					// args is an array of strings
+					memory32[((pnum)>>2)] = args.length;
+					return 0;
+				},
+				args_get: function(argv, argv_buf) {
+					console.log(argv, argv_buf)
+					// args is an array of strings
+					for (var i = 0; i < args.length; i++) {
+						let arr = [];
+						var ptr = memory32[((argv)>>2)];
+						var len = args[i].length;
+						for (var j = 0; j < len; j++) {
+							memory8[ptr+j] = args[i].charCodeAt(j);
+							arr.push(memory8[ptr+j])
+						}
+						memory32[(((argv)+(4))>>2)] = len;
+						argv += 8;
+						console.log(String.fromCharCode.apply(null, arr));
+					}
+					return 0;
+				},
 			},
 		}
 	}
