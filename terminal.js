@@ -587,43 +587,50 @@ input.prototype.key = function (e) {
 // webassembly module for terminal ============================================================
 // not ready
 
-var wasm = function (url, term, importObject = null) {
+var wasm = function (url, importObject = true, term = null) {
 	var memory;
-	if (importObject === null) {
+	if (importObject === true) {
 		var importObject = {
-			env: {
-				__stack_pointer: 0,
-				__memory_base: 0,
-				__table_base: 0,
-				memory: function (initial) {
-					memory = new WebAssembly.Memory({initial: initial});
-					return memory;
+			wasi_snapshot_preview1:{
+				proc_exit: function(code) {
+					console.log("exit code: ", code);
+					return 1;
 				},
-				__indirect_function_table: function (initial) {
-					return new WebAssembly.Table({initial: initial, element: "anyfunc"});
-				},
-				puts: function (offset, length) {
-					console.log(offset)
-					if (length) {
-						let buffer = new Uint8Array(memory.buffer);
-						let r = ""
-						for (let i = offset; buffer[i] ; i++) {
-							r += String.fromCharCode(buffer[i])
+				// https://github.com/WebAssembly/WASI/blob/main/phases/snapshot/docs.md#-fd_writefd-fd-iovs-ciovec_array---resultsize-errno
+				// TypeScript: fd_write  (fd: number, iovs: iovec_t, iovs_len: number, errno: number): number
+				fd_write: function(fd, iovs, iovs_len, errno) {
+					// fd: https://en.wikipedia.org/wiki/File_descriptor					
+					console.log("fd_write: ", fd, iovs, iovs_len, errno);
+
+					console.log(new TextDecoder('utf8').decode(new Uint8Array(memory.buffer, iovs , iovs_len)));
+					if (fd === 0) {
+						// stdin
+						console.log("stdin: ", iovs, iovs_len);
+						return 0;
+					}else if (fd === 1) {
+						// stdout
+						var iov = new Uint8Array(memory.buffer, iovs, iovs_len);
+						var str = "";
+						for (var i = 0; i < iovs_len; i++) {
+							str += String.fromCharCode(iov[i]);
 						}
-						term.puts(r);
+						if (term != null) term.puts(str);
+						console.log("stdout: ", str);
+						return iovs_len;
 					} else {
-						term.puts(offset);
+						// stderr
+						console.log("fd_write: ", fd, iovs, iovs_len);
+						return -1;
 					}
 				},
-				putchar: function (c) {
-					term.putchar(c)
+				fd_close: function(fd) {
+					console.log(fd)
+					return 1;
 				},
-				getColumns: () => {
-					return term.column;
-				},
-				getRows: () => {
-					return term.lines;
-				},
+				fd_seek: function(fd, offset, whence) {
+					console.log(fd, offset, whence)
+					return 1;
+				}
 			},
 		}
 	}
